@@ -21,10 +21,32 @@ def is_valid(url):
     # Decide whether to crawl this url or not. 
     # If you decide to crawl it, return True; otherwise return False.
     # There are already some conditions that return False.
+
+    # Valid domains for the assignment:
+    # *.ics.uci.edu/*           => \.ics.uci.edu\/{0,1}
+    # *.cs.uci.edu/*            => \.cs.uci.edu\/{0,1}
+    # *.informatics.uci.edu/*   => \.informatics.uci.edu\/{0,1}
+    # *.stat.uci.edu/*          => \.stat.uci.edu\/{0,1}
+    # today.uci.edu/department/information_computer_sciences/*
+    #                           => ^today.uci.edu\/department\/information_computer_sciences\/{0,1}
+
     try:
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
+        # Is valid domain?
+        # TODO: Come back to check my regex lol
+        if re.search("\.ics.uci.edu\/{0,1}", url) == None:
+            return False 
+        elif re.search("\.cs.uci.edu\/{0,1}", url) == None:
+            return False
+        elif re.search("\.informatics.uci.edu\/{0,1}", url) == None:
+            return False
+        elif re.search("\.stat.uci.edu\/{0,1}", url) == None:
+            return False 
+        elif re.search("^today.uci.edu\/department\/information_computer_sciences\/{0,1}", url) == None:
+            return False
+
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
