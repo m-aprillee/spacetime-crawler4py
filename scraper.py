@@ -1,5 +1,8 @@
 import re
-from urllib.parse import urlparse
+from urllib.parse import urlparse 
+from bs4 import BeautifulSoup
+
+visited = set()
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -16,9 +19,15 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
     next_links = list()
-    if resp.status == 200:
-        # TODO: get hyperlinks
-        pass
+    if resp.status == 200 and url not in visited and resp.url not in visited and resp.raw_response:
+        soup = BeautifulSoup(resp.raw_response.content, 'lxml')
+        for link in soup.find_all('a'):
+            if link.has_attr("href"):
+                url_defrag = urlparse.urldefrag(link.get('href'))[0] 
+                next_links.append(url_defrag)
+        visited.add(url)
+        visited.add(resp.url)
+        # TODO: get hyperlinks, strip fragment
     return next_links
 
 def is_valid(url):
@@ -40,15 +49,17 @@ def is_valid(url):
             return False
         # Is valid domain?
         # TODO: Come back to check my regex lol
-        if re.search("\.ics.uci.edu\/{0,1}", url) == None:
-            return False 
-        elif re.search("\.cs.uci.edu\/{0,1}", url) == None:
-            return False
-        elif re.search("\.informatics.uci.edu\/{0,1}", url) == None:
-            return False
-        elif re.search("\.stat.uci.edu\/{0,1}", url) == None:
-            return False 
-        elif re.search("^today.uci.edu\/department\/information_computer_sciences\/{0,1}", url) == None:
+        if re.search("\.ics.uci.edu\/{0,1}", url) != None:
+            pass
+        elif re.search("\.cs.uci.edu\/{0,1}", url) != None:
+            pass
+        elif re.search("\.informatics.uci.edu\/{0,1}", url) != None:
+            pass
+        elif re.search("\.stat.uci.edu\/{0,1}", url) != None:
+            pass
+        elif re.search("^today.uci.edu\/department\/information_computer_sciences\/{0,1}", url) != None:
+            pass
+        else:
             return False
 
         return not re.match(
