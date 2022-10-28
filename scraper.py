@@ -1,8 +1,34 @@
 import re
-from urllib.parse import urlparse 
+from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
 
 visited = set()
+longestWords = 0
+
+#TODO: ADD GLOBAL VARIABLES THAT WILL HELP US COLLECT DATA FOR REPORT
+
+def tokenize(text):
+    # I took this from my assignment 1 - Alisa
+    res = []
+    for line in text.split('\n'):
+        for word in line.split():
+            if bool(re.match('^[a-zA-Z0-9]+$', word)): # if the word is alphanumeric
+                res.append(word.lower())
+            else:
+                addTokens = [] # stores the words that we must add
+                currWord = []
+                for c in word:
+                    if not bool(re.match('^[a-zA-Z0-9]$', c)): # if not alphanumeric char, we will reset the currWord = ""
+                        if currWord != []: 
+                            addTokens.append("".join(currWord)) # we only want to append currWord if it's not ""
+                            currWord = []
+                    else:
+                        currWord.append(c.lower())
+
+                if currWord != []: # if after we finish looping through the whole word and there's a word we haven't added
+                    addTokens.append("".join(currWord)) # we add that word that we haven't added yet
+                res += addTokens # then we add all these words to the result!
+    return res
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -19,15 +45,21 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
     next_links = list()
-    if resp.status == 200 and url not in visited and resp.url not in visited and resp.raw_response:
-        soup = BeautifulSoup(resp.raw_response.content, 'lxml')
-        for link in soup.find_all('a'):
-            if link.has_attr("href"):
-                url_defrag = urlparse.urldefrag(link.get('href'))[0] 
-                next_links.append(url_defrag)
-        visited.add(url)
-        visited.add(resp.url)
-        # TODO: get hyperlinks, strip fragment
+
+    if resp.status != 200 or url in visited or resp.url in visited or resp.raw_response == None:
+        return next_links
+
+    soup = BeautifulSoup(resp.raw_response.content, 'lxml')
+    for link in soup.find_all('a'):
+        if link.has_attr("href"):
+            url_defrag = urldefrag(link.get('href'))[0] 
+            next_links.append(url_defrag)
+
+    visited.add(url)
+    visited.add(resp.url)
+    
+    # TODO: IMPLEMENT COLLECTING DATA FOR THE REPORT
+
     return next_links
 
 def is_valid(url):
@@ -43,14 +75,22 @@ def is_valid(url):
     # today.uci.edu/department/information_computer_sciences/*
     #                           => ^today.uci.edu\/department\/information_computer_sciences\/{0,1}
 
+    if not url:
+        return False
+    domains = set(['.ics.uci.edu/', '.cs.uci.edu/', '.informatics.uci.edu/', '.stat.uci.edu/', 'today.uci.edu/department/information_computer_sciences/'])
+
     try:
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
-        # Is valid domain?
-        # TODO: Come back to check my regex lol
+
+        for domain in domains:
+            if domain in url:
+                return True
+
+
         if re.search("\.ics.uci.edu\/{0,1}", url) != None:
-            pass
+            return True
         elif re.search("\.cs.uci.edu\/{0,1}", url) != None:
             pass
         elif re.search("\.informatics.uci.edu\/{0,1}", url) != None:
