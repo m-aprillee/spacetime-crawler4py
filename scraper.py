@@ -11,28 +11,21 @@ wordCounts = dict()
 subdomainPages = dict()
 
 #TODO: ADD GLOBAL VARIABLES THAT WILL HELP US COLLECT DATA FOR REPORT
-def updateText(content):
-    #get text from content (use beautifulsoup?)
+def updateText(content, url):
     soup = BeautifulSoup(content, 'html.parser')
     text = soup.get_text()
-    
     #append text to text file
     f = open("text.txt", "a")
     f.write(";;;;;\n")
+    f.write(url)
+    f.write('\n')
     f.write(text)
     f.close()
 
-
 def updateReport():
+    #this function isn't being used rn since all the data we need
+    #is being stored in a text file... but i'll keep it here for now in case
     #read data from file
-
-    #1
-    #try:
-        #f1 = open("1.txt","r")
-        #l = f1.readline()
-        #count = int(l.strip())
-    #except:
-        #pass
 
     #1: unique urls
     f = open("1.pkl","wb")
@@ -91,7 +84,9 @@ def tokenize(text):
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     updateReport()
-    return [link for link in links if is_valid(link)]
+    print('found links:', links)
+    print('valid links:', [link for link in links if is_valid(link)])
+    return list({link for link in links if is_valid(link)})
 
 def extract_next_links(url, resp):
     # Implementation required.
@@ -114,18 +109,11 @@ def extract_next_links(url, resp):
             url_defrag = urldefrag(link.get('href'))[0] 
             next_links.append(url_defrag)
 
-    updateText(resp.raw_response.content)
+    updateText(resp.raw_response.content, resp.url)
 
+    #TODO 
     visited.add(url)
     visited.add(resp.url)
-    
-    #print('nextlinks', next_links)
-    
-    #x = input()
-    
-    # TODO: IMPLEMENT COLLECTING DATA FOR THE REPORT
-    #number of links
-    print('num visited:', len(visited))
 
     return next_links
 
@@ -151,13 +139,8 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
 
-        #for domain in domains:
-            #if domain in url:
-                #return True
-
-
         if re.search("\.ics.uci.edu\/{0,1}", url) != None:
-            return True
+            pass
         elif re.search("\.cs.uci.edu\/{0,1}", url) != None:
             pass
         elif re.search("\.informatics.uci.edu\/{0,1}", url) != None:
@@ -173,7 +156,7 @@ def is_valid(url):
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
             + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
-            + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
+            + r"|ps|eps|tex|ppt|pptx|ppsx|doc|docx|xls|xlsx|names"
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
             + r"|epub|dll|cnf|tgz|sha1"
             + r"|thmx|mso|arff|rtf|jar|csv"
