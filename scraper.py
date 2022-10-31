@@ -32,6 +32,7 @@ def tokenize(text):
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
+    #print('validlinks', [link for link in links if is_valid(link)])
     return [link for link in links if is_valid(link)]
 
 def extract_next_links(url, resp):
@@ -58,7 +59,13 @@ def extract_next_links(url, resp):
     visited.add(url)
     visited.add(resp.url)
     
+    #print('nextlinks', next_links)
+    
+    #x = input()
+    
     # TODO: IMPLEMENT COLLECTING DATA FOR THE REPORT
+    #number of links
+    print('num visited:', len(visited))
 
     return next_links
 
@@ -84,9 +91,9 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
 
-        for domain in domains:
-            if domain in url:
-                return True
+        #for domain in domains:
+            #if domain in url:
+                #return True
 
 
         if re.search("\.ics.uci.edu\/{0,1}", url) != None:
