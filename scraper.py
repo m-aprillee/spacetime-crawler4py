@@ -136,7 +136,21 @@ def is_valid(url):
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
+        
+        if re.match(r".*\.ics.uci.edu/\.*", url):
+            pass
+        elif re.match(r".*\.cs.uci.edu/\.*", url):
+            pass
+        elif re.match(r".*\.informatics.uci.edu/\.*", url):
+            pass
+        elif re.match(r".*\.stat.uci.edu/\.*", url):
+            pass
+        elif re.match(r"^today.uci.edu\/department\/information_computer_sciences\/.*", url):
+            pass
+        else:
+            return False
 
+        '''
         if re.search("\.ics.uci.edu\/{0,1}", url) != None:
             pass
         elif re.search("\.cs.uci.edu\/{0,1}", url) != None:
@@ -149,6 +163,7 @@ def is_valid(url):
             pass
         else:
             return False
+            '''
         
         if re.match(r".*\/pdf.*", parsed.path.lower()):
             return False
@@ -161,7 +176,7 @@ def is_valid(url):
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
             + r"|epub|dll|cnf|tgz|sha1"
             + r"|thmx|mso|arff|rtf|jar|csv"
-            + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
+            + r"|rm|smil|wmv|swf|wma|zip|rar|gz|odc)$", parsed.path.lower())
 
     except TypeError:
         print ("TypeError for ", parsed)
