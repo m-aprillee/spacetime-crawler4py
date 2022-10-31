@@ -1,11 +1,69 @@
 import re
 from urllib.parse import urlparse, urldefrag
 from bs4 import BeautifulSoup
+import pickle
 
 visited = set()
 longestWords = 0
+pageWithMostWords = ''
+numMostWords = 0
+wordCounts = dict()
+subdomainPages = dict()
 
 #TODO: ADD GLOBAL VARIABLES THAT WILL HELP US COLLECT DATA FOR REPORT
+def updateText(content):
+    #get text from content (use beautifulsoup?)
+    soup = BeautifulSoup(content, 'html.parser')
+    text = soup.get_text()
+    
+    #append text to text file
+    f = open("text.txt", "a")
+    f.write(";;;;;\n")
+    f.write(text)
+    f.close()
+
+
+def updateReport():
+    #read data from file
+
+    #1
+    #try:
+        #f1 = open("1.txt","r")
+        #l = f1.readline()
+        #count = int(l.strip())
+    #except:
+        #pass
+
+    #1: unique urls
+    f = open("1.pkl","wb")
+    pickle.dump(visited, f)
+    f.close()
+
+    #2: page with most words
+    f = open("2.pkl","wb")
+    pickle.dump((pageWithMostWords, numMostWords), f)
+    f.close()
+
+    #3: most common words and counts
+    f = open("3.pkl", "wb")
+    pickle.dump(wordCounts, f)
+    f.close()
+
+    #4: subdomains in ics.uci.edu and number of pages
+    f = open("4.pkl", "wb")
+    pickle.dump(subdomainPages, f)
+    f.close()
+
+    #file 1:
+    #{count}
+    #file 2:
+    #{page}
+    #{num of words in that page}
+    #file 3:
+    #{word, count of word} * 50
+    #file 4:
+    #{subdomain in ics.uci.edu, num of pages} * n
+
 
 def tokenize(text):
     # I took this from my assignment 1 - Alisa
@@ -32,7 +90,7 @@ def tokenize(text):
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
-    #print('validlinks', [link for link in links if is_valid(link)])
+    updateReport()
     return [link for link in links if is_valid(link)]
 
 def extract_next_links(url, resp):
@@ -55,6 +113,8 @@ def extract_next_links(url, resp):
         if link.has_attr("href"):
             url_defrag = urldefrag(link.get('href'))[0] 
             next_links.append(url_defrag)
+
+    updateText(resp.raw_response.content)
 
     visited.add(url)
     visited.add(resp.url)
