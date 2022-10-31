@@ -83,7 +83,7 @@ def tokenize(text):
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
-    updateReport()
+    #updateReport()
     return list({link for link in links if is_valid(link)})
 
 def extract_next_links(url, resp):
@@ -149,6 +149,8 @@ def is_valid(url):
             pass
         else:
             return False
+        
+        if re.match(r".*")
 
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
