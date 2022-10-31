@@ -84,8 +84,6 @@ def tokenize(text):
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     updateReport()
-    print('found links:', links)
-    print('valid links:', [link for link in links if is_valid(link)])
     return list({link for link in links if is_valid(link)})
 
 def extract_next_links(url, resp):
