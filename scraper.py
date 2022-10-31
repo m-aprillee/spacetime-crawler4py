@@ -4,13 +4,7 @@ from bs4 import BeautifulSoup
 import pickle
 
 visited = set()
-longestWords = 0
-pageWithMostWords = ''
-numMostWords = 0
-wordCounts = dict()
-subdomainPages = dict()
 
-#TODO: ADD GLOBAL VARIABLES THAT WILL HELP US COLLECT DATA FOR REPORT
 def updateText(content, url):
     soup = BeautifulSoup(content, 'html.parser')
     text = soup.get_text()
@@ -21,41 +15,22 @@ def updateText(content, url):
     f.write('\n')
     f.write(text)
     f.close()
-
-def updateReport():
-    #this function isn't being used rn since all the data we need
-    #is being stored in a text file... but i'll keep it here for now in case
-    #read data from file
-
-    #1: unique urls
-    f = open("1.pkl","wb")
+    
+def saveVisited():
+    f = open('visited.pkl', 'wb')
     pickle.dump(visited, f)
     f.close()
-
-    #2: page with most words
-    f = open("2.pkl","wb")
-    pickle.dump((pageWithMostWords, numMostWords), f)
-    f.close()
-
-    #3: most common words and counts
-    f = open("3.pkl", "wb")
-    pickle.dump(wordCounts, f)
-    f.close()
-
-    #4: subdomains in ics.uci.edu and number of pages
-    f = open("4.pkl", "wb")
-    pickle.dump(subdomainPages, f)
-    f.close()
-
-    #file 1:
-    #{count}
-    #file 2:
-    #{page}
-    #{num of words in that page}
-    #file 3:
-    #{word, count of word} * 50
-    #file 4:
-    #{subdomain in ics.uci.edu, num of pages} * n
+    
+def loadVisited():
+    v = set()
+    try:
+        f = open('visited.pkl', 'rb')
+        v = pickle.load(f)
+        f.close()
+    except:
+        f = open('visited.pkl', 'wb')
+        f.close()
+    return v
 
 
 def tokenize(text):
@@ -83,7 +58,6 @@ def tokenize(text):
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
-    #updateReport()
     return list({link for link in links if is_valid(link)})
 
 def extract_next_links(url, resp):
@@ -110,8 +84,12 @@ def extract_next_links(url, resp):
     updateText(resp.raw_response.content, resp.url)
 
     #TODO save visited everytime crawler stops so it doesn't get reset
+    if len(visited) == 0:
+        visited.update(loadVisited())
     visited.add(url)
     visited.add(resp.url)
+    saveVisited()
+    print(len(visited))
 
     return next_links
 
