@@ -109,7 +109,7 @@ def extract_next_links(url, resp):
 
     updateText(resp.raw_response.content, resp.url)
 
-    #TODO 
+    #TODO save visited everytime crawler stops so it doesn't get reset
     visited.add(url)
     visited.add(resp.url)
 
@@ -150,7 +150,8 @@ def is_valid(url):
         else:
             return False
         
-        if re.match(r".*")
+        if re.match(r".*\/pdf.*"):
+            return False
 
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
