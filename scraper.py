@@ -150,7 +150,7 @@ def is_valid(url):
         else:
             return False
         
-        if re.match(r".*\/pdf.*"):
+        if re.match(r".*\/pdf.*", parsed.path.lower()):
             return False
 
         return not re.match(
