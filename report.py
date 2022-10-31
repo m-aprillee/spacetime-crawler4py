@@ -17,40 +17,42 @@ def processText():
     
     for line in f:
         line = line.strip()
-        if readPage == True:
-            currPage = line
-            #check for ics.uci.edu subdomains
-            o = urlparse(currPage)
-            if 'ics.uci.edu' in o.netloc:
-                if o.netloc not in icsSubdomains:
-                    icsSubdomains[o.netloc] = 1
-                else:
-                    icsSubdomains[o.netloc] += 1
-                    
-            readPage = False
-        else:
-            if line == ';;;;;':
-                #check for highest word count
-                if currFileWordCount > mostWordCount:
-                    pageMostWords = currPage
-                currFileWordCount = 0
-                readPage = True
-                numPages += 1
+        if line != '':
+            if readPage == True:
+                currPage = line
+                #check for ics.uci.edu subdomains
+                o = urlparse(currPage)
+                if 'ics.uci.edu' in o.netloc:
+                    if o.netloc not in icsSubdomains:
+                        icsSubdomains[o.netloc] = 1
+                    else:
+                        icsSubdomains[o.netloc] += 1
+
+                readPage = False
             else:
-                tokens = tokenize(line)
-                for t in tokens:
-                    currFileWordCount += 1
-                    if len(t) > 1:
-                        if t not in STOPWORDS:
-                            if t not in wordCounts:
-                                wordCounts[t] = 1
-                            else:
-                                wordCounts[t] += 1
+                if line == ';;;;;':
+                    #check for highest word count
+                    if currFileWordCount > mostWordCount:
+                        pageMostWords = currPage
+                        mostWordCount = currFileWordCount
+                    currFileWordCount = 0
+                    readPage = True
+                    numPages += 1
+                else:
+                    tokens = tokenize(line)
+                    for t in tokens:
+                        currFileWordCount += 1
+                        if len(t) > 1:
+                            if t not in STOPWORDS:
+                                if t not in wordCounts:
+                                    wordCounts[t] = 1
+                                else:
+                                    wordCounts[t] += 1
     f.close()
     
     print('REPORT')
     print('Number of unique pages:', numPages)
-    print('Longest page:', pageMostWords)
+    print('Longest page:', pageMostWords, 'Word Count:', mostWordCount)
     print('50 most common words and their counts:')
     printFrequencies(wordCounts, 50)
     print('Subdomains in ics.uci.edu and number of pages each:')
