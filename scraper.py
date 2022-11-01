@@ -97,7 +97,7 @@ def is_low_information(url):
 # Return true if classified as low information url
     if re.search(r"\?action=login$", url):                # No need to crawl login pages
         return True
-    if re.search(r".zip$", url):                          # Just takes to .zip download
+    if re.search(r".zip$", url) or re.search(r".ps$", url) or re.search(r".ps.gz$", url):        # Just takes to download
         return True
     if re.search(r"\?ical=\d$", url):                     # Calendar stuff
         return True
