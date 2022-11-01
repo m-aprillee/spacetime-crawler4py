@@ -101,6 +101,8 @@ def is_low_information(url):
         return True
     if re.search(r"\?ical=\d$", url):                     # Calendar stuff
         return True
+    if re.search(r"\?share=facebook$", url) or re.search(r"\?share=twitter$", url):              # SNS share
+        return True
     return False
 
 def is_valid(url):
