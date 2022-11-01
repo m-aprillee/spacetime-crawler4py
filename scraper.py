@@ -93,6 +93,16 @@ def extract_next_links(url, resp):
 
     return next_links
 
+def is_low_information(url):
+# Return true if classified as low information url
+    if re.search(r"\?action=login$", url):                # No need to crawl login pages
+        return True
+    if re.search(r".zip$", url):                          # Just takes to .zip download
+        return True
+    if re.search(r"\?ical=\d$", url):                     # Calendar stuff
+        return True
+    return False
+
 def is_valid(url):
     # Decide whether to crawl this url or not. 
     # If you decide to crawl it, return True; otherwise return False.
@@ -113,6 +123,9 @@ def is_valid(url):
     try:
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
+            return False
+
+        if is_low_information(url):
             return False
         
         if re.match(r".*\.ics.uci.edu/\.*", url):
