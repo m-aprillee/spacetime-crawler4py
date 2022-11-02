@@ -93,6 +93,20 @@ def extract_next_links(url, resp):
 
     return next_links
 
+def is_low_information(url):
+# Return true if classified as low information url
+    if re.search(r"\?action=login$", url):                # No need to crawl login pages
+        return True
+    if re.search(r".zip$", url) or re.search(r".ps$", url) or re.search(r".ps.gz$", url):        # Just takes to download
+        return True
+    if re.search(r"\?ical=\d+$", url):                     # Calendar stuff
+        return True
+    if re.search(r"\/img_\d+$", url):                     # Just one image
+        return True
+    if re.search(r"\?share=facebook$", url) or re.search(r"\?share=twitter$", url):              # SNS share
+        return True
+    return False
+
 def is_valid(url):
     # Decide whether to crawl this url or not. 
     # If you decide to crawl it, return True; otherwise return False.
@@ -113,6 +127,9 @@ def is_valid(url):
     try:
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
+            return False
+
+        if is_low_information(url):
             return False
         
         if re.match(r".*\.ics.uci.edu/\.*", url):
