@@ -22,11 +22,11 @@ def processText():
                 currPage = line
                 #check for ics.uci.edu subdomains
                 o = urlparse(currPage)
-                if 'ics.uci.edu' in o.netloc:
-                    if o.netloc not in icsSubdomains:
-                        icsSubdomains[o.netloc] = 1
+                if 'ics.uci.edu' in (o.netloc).lower():
+                    if (o.netloc).lower() not in icsSubdomains:
+                        icsSubdomains[(o.netloc).lower()] = 1
                     else:
-                        icsSubdomains[o.netloc] += 1
+                        icsSubdomains[(o.netloc).lower()] += 1
 
                 readPage = False
             else:
@@ -56,7 +56,7 @@ def processText():
     print('50 most common words and their counts:')
     printFrequencies(wordCounts, 50)
     print('Subdomains in ics.uci.edu and number of pages each:')
-    printFrequencies(icsSubdomains)
+    printFrequencies(icsSubdomains, sort='a')
     
     
 def printFrequencies(items, numToShow = -1, sort = 'f'):
