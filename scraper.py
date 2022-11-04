@@ -83,7 +83,6 @@ def extract_next_links(url, resp):
 
     updateText(resp.raw_response.content, resp.url)
 
-    #TODO save visited everytime crawler stops so it doesn't get reset
     if len(visited) == 0:
         visited.update(loadVisited())
     visited.add(url)
@@ -94,7 +93,7 @@ def extract_next_links(url, resp):
     return next_links
 
 def is_low_information(url):
-# Return true if classified as low information url
+    # Return true if classified as low information url
     if re.search(r"\?action=login$", url):                # No need to crawl login pages
         return True
     if re.search(r".zip$", url) or re.search(r".ps$", url) or re.search(r".ps.gz$", url):        # Just takes to download
@@ -144,21 +143,6 @@ def is_valid(url):
             pass
         else:
             return False
-
-        '''
-        if re.search("\.ics.uci.edu\/{0,1}", url) != None:
-            pass
-        elif re.search("\.cs.uci.edu\/{0,1}", url) != None:
-            pass
-        elif re.search("\.informatics.uci.edu\/{0,1}", url) != None:
-            pass
-        elif re.search("\.stat.uci.edu\/{0,1}", url) != None:
-            pass
-        elif re.search("^today.uci.edu\/department\/information_computer_sciences\/{0,1}", url) != None:
-            pass
-        else:
-            return False
-            '''
         
         if re.match(r".*\/pdf.*", parsed.path.lower()):
             return False
